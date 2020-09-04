@@ -24,12 +24,12 @@ class logLoader:
         return("hello world")
 
     def dxdLoader(self):
-        df_dxd = pd.read_csv(self.dxd, skiprows=7)
+        df_dxd = pd.read_csv(self.dxd, skiprows=7, error_bad_lines=False)
         df_dxd.drop(df_dxd.columns[[3, 4, 6, 7, 9, 10, 12, 13, 15, 16,
-                                18, 19, 21, 22, 24, 25, 27, 28, 30, 31]], axis=1, inplace=True)
-        
-        df_dxd.columns = ['Date', 'Time', 'Ext3Up', 'Ext3Down', 'Ext4Up',
-                            'Ext4Down', 'SS1Up', 'SS1Down', 'SS2Up', 'SS2Down', 'DeadulusDown', 'DeadulusUp']
+                        18, 19, 21, 22, 24, 25, 27, 28, 30, 31, 33, 34, 36, 37, 39, 40, 42,43,44,45,46,47,48,49,50,51,52,53,54,55]], axis=1, inplace=True)
+        # print(df_dxd.head())
+        df_dxd.columns = ['Date', 'Time','SS1Conf', 'SS1Up', 'SS1Down', 'SS2Conf', 'SS2Up', 
+                                'SS2Down', 'Ext3Conf', 'Ext3Up', 'Ext3Down', 'Ext4Conf', 'Ext4Up', 'Ext4Down', 'DeadulusUp', 'DeadulusDown']
         df_dxd['DateTime'] = pd.to_datetime(df_dxd['Date'] + " " + df_dxd['Time'])
         df_dxd['DateTime'] = df_dxd['DateTime'].dt.round('30s')  
         df_dxd = df_dxd.dropna()
@@ -110,6 +110,7 @@ class logLoader:
         df_eor = df_eor.drop(df_eor.columns[[1, 3, 4, 5, 6, 7, 8, 9, 12, 13 ,16 ,17, 19, 21, 22, 23, 24,
                                             25, 26, 27 ,28, 29, 30, 34, 36, 37, 38, 39, 40, 41, 42, 
                                             43, 44, 45]], axis=1)
+        
         df_eor.columns = ['DateTime', 'EORPConf', 'P1_injV', 'P1_injQ', 'P2_injV', 'P2_ingQ', 'EORUP',
                             'EORDOWN', 'EORVol', 'EORRate', 'EORDP', 'EORHES']
         df_eor.drop_duplicates('DateTime', inplace=True)
@@ -135,6 +136,7 @@ class logLoader:
         #merge logs
         df_dxd_temp = pd.read_sql_query("SELECT * from dxd", self.conn)
         df_dxd_temp['DateTime'] = pd.to_datetime(df_dxd_temp['DateTime'] ,errors='coerce')
+        
         df_vin_temp = pd.read_sql_query("SELECT * from vin", self.conn)
         df_vin_temp['DateTime'] = pd.to_datetime(df_vin_temp['DateTime'] ,errors='coerce')
         df_vinnmr_temp = pd.read_sql_query("SELECT * from vinnmr", self.conn)
@@ -143,6 +145,9 @@ class logLoader:
         df_isco_temp['DateTime'] = pd.to_datetime(df_isco_temp['DateTime'] ,errors='coerce')
         df_eor_temp = pd.read_sql_query("SELECT * from EOR", self.conn)
         df_eor_temp['DateTime'] = pd.to_datetime(df_eor_temp['DateTime'] ,errors='coerce')
+        df_dxd_temp = df_dxd_temp.sort_values('DateTime')
+        df_dxd_temp = df_dxd_temp.drop_duplicates(subset='DateTime', keep="first")
+        # df_dxd_temp.to_csv('out.csv')
         df_com = pd.merge_asof(df_dxd_temp, df_vin_temp.sort_values('DateTime'), on='DateTime')
         df_com = pd.merge_asof(df_com, df_vinnmr_temp.sort_values('DateTime'), on='DateTime')
         df_com = pd.merge_asof(df_com, df_isco_temp.sort_values('DateTime'), on='DateTime')
@@ -169,8 +174,8 @@ class logLoader:
 # eor = df_ll['address']['eor']
 
 # x = logLoader(dxd, isco, vindum, vindumNMR, eor)
-#print(x.test())
-#x.dxdLoader()
+# print(x.test())
+# x.dxdLoader()
 # x.iscoLoader()
 # x.vindumLoader()
 # x.vindumnmrLoader()

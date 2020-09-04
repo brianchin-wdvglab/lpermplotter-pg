@@ -15,7 +15,7 @@ import os.path
 import csv
 from sklearn import datasets, linear_model
 from visc import visc
-from sampledata import sample_data
+from sampledata import sample_data, sample_data_dead
 from sampleparser import sample
 import dash_bootstrap_components as dbc
 import logloader
@@ -132,9 +132,9 @@ def plot0(n):
                     yaxis2=dict(title="Pressure - psia", titlefont=dict(color="Red"), tickfont=dict(
                         color="Red"), anchor="free", overlaying="y", side="right", position=0.85, range=[0, 10000]),
                     yaxis3=dict(title="Flow rate - cc/min", titlefont=dict(color="Green"), tickfont=dict(
-                        color="Green"), anchor="free", overlaying="y", side="right", position=0.89, range=[0, .005]),
+                        color="Green"), anchor="free", overlaying="y", side="right", position=0.89, range=[0, .0005]),
                     yaxis4=dict(title="q over dp", titlefont=dict(color="Black"), tickfont=dict(
-                        color="Black"), anchor="free", overlaying="y", side="right", position=0.93, range=[0, .000005]),
+                        color="Black"), anchor="free", overlaying="y", side="right", position=0.93, range=[0, .000001]),
                     yaxis5=dict(title="confining pressure", titlefont=dict(color="Orange"), tickfont=dict(
                         color="Orange"), anchor="free", overlaying="y", side="right", position=0.97, range=[0, 10000]))
     return fig
@@ -174,9 +174,9 @@ def plot1(n):
                     yaxis2=dict(title="Pressure - psia", titlefont=dict(color="Red"), tickfont=dict(
                         color="Red"), anchor="free", overlaying="y", side="right", position=0.85, range=[0, 10000]),
                     yaxis3=dict(title="Flow rate - cc/min", titlefont=dict(color="Green"), tickfont=dict(
-                        color="Green"), anchor="free", overlaying="y", side="right", position=0.89, range=[0, .005]),
+                        color="Green"), anchor="free", overlaying="y", side="right", position=0.89, range=[0, .0005]),
                     yaxis4=dict(title="q over dp", titlefont=dict(color="Black"), tickfont=dict(
-                        color="Black"), anchor="free", overlaying="y", side="right", position=0.93, range=[0, .000005]),
+                        color="Black"), anchor="free", overlaying="y", side="right", position=0.93, range=[0, .000001]),
                     yaxis5=dict(title="confining pressure", titlefont=dict(color="Orange"), tickfont=dict(
                         color="Orange"), anchor="free", overlaying="y", side="right", position=0.97, range=[0, 10000]))
     return fig
@@ -216,9 +216,9 @@ def plot2(n):
                     yaxis2=dict(title="Pressure - psia", titlefont=dict(color="Red"), tickfont=dict(
                         color="Red"), anchor="free", overlaying="y", side="right", position=0.85, range=[0, 10000]),
                     yaxis3=dict(title="Flow rate - cc/min", titlefont=dict(color="Green"), tickfont=dict(
-                        color="Green"), anchor="free", overlaying="y", side="right", position=0.89, range=[0, .005]),
+                        color="Green"), anchor="free", overlaying="y", side="right", position=0.89, range=[0, .0005]),
                     yaxis4=dict(title="q over dp", titlefont=dict(color="Black"), tickfont=dict(
-                        color="Black"), anchor="free", overlaying="y", side="right", position=0.93, range=[0, .000005]),
+                        color="Black"), anchor="free", overlaying="y", side="right", position=0.93, range=[0, .000001]),
                     yaxis5=dict(title="confining pressure", titlefont=dict(color="Orange"), tickfont=dict(
                         color="Orange"), anchor="free", overlaying="y", side="right", position=0.97, range=[0, 10000]))
     return fig
@@ -258,9 +258,9 @@ def plot3(n):
                     yaxis2=dict(title="Pressure - psia", titlefont=dict(color="Red"), tickfont=dict(
                         color="Red"), anchor="free", overlaying="y", side="right", position=0.85, range=[0, 10000]),
                     yaxis3=dict(title="Flow rate - cc/min", titlefont=dict(color="Green"), tickfont=dict(
-                        color="Green"), anchor="free", overlaying="y", side="right", position=0.89, range=[0, .005]),
+                        color="Green"), anchor="free", overlaying="y", side="right", position=0.89, range=[0, .0005]),
                     yaxis4=dict(title="q over dp", titlefont=dict(color="Black"), tickfont=dict(
-                        color="Black"), anchor="free", overlaying="y", side="right", position=0.93, range=[0, .000005]),
+                        color="Black"), anchor="free", overlaying="y", side="right", position=0.93, range=[0, .000001]),
                     yaxis5=dict(title="confining pressure", titlefont=dict(color="Orange"), tickfont=dict(
                         color="Orange"), anchor="free", overlaying="y", side="right", position=0.97, range=[0, 10000]))
     return fig
@@ -270,7 +270,7 @@ def plot3(n):
 # m is the sheet name
 def plot4(n):
     current_sample = sample(samplesheet, 5).sampleprop()
-    df_current = sample_data(current_sample)
+    df_current = sample_data_dead(current_sample)
     csv_output(df_current, current_sample)
     xax=df_current.DateTime
     fig = go.Figure()
@@ -300,9 +300,9 @@ def plot4(n):
                     yaxis2=dict(title="Pressure - psia", titlefont=dict(color="Red"), tickfont=dict(
                         color="Red"), anchor="free", overlaying="y", side="right", position=0.85, range=[0, 5000]),
                     yaxis3=dict(title="Flow rate - cc/min", titlefont=dict(color="Green"), tickfont=dict(
-                        color="Green"), anchor="free", overlaying="y", side="right", position=0.89, range=[0, .005]),
+                        color="Green"), anchor="free", overlaying="y", side="right", position=0.89, range=[0, .0005]),
                     yaxis4=dict(title="q over dp", titlefont=dict(color="Black"), tickfont=dict(
-                        color="Black"), anchor="free", overlaying="y", side="right", position=0.93, range=[0, .000005]),
+                        color="Black"), anchor="free", overlaying="y", side="right", position=0.93, range=[0, .000001]),
                     yaxis5=dict(title="confining pressure", titlefont=dict(color="Orange"), tickfont=dict(
                         color="Orange"), anchor="free", overlaying="y", side="right", position=0.97, range=[0, 10000]))
     return fig
