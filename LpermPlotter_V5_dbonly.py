@@ -23,35 +23,35 @@ import time
 
 samplesheet = r"M:\Team Chaos Liquid Perm Initialization v5.xlsx"
 outputfolder = r"C:\Users\Brian.Chin\learning\lpermplotter_db_postgres\temp"
-def csv_output(df_current, current_sample):
-    df_current_output = pd.DataFrame()
-    df_current_output['DateTime'] = df_current['DateTime']
-    df_current_output['Upstream Pressure (psi)'] = df_current['Upstream Pressure']
-    df_current_output['Downstream Pressure (psi)'] = df_current['Downstream Pressure']
-    df_current_output['dp'] = df_current['dp']
-    df_current_output['absdp'] = df_current['absdp']
-    df_current_output['Rate (cc/min)'] = df_current['Rate']
-    df_current_output['Confining Pressure (psi)'] = df_current['Confining Pressure']
-    df_current_output['Comments'] = df_current['Comment']
-    df_current_output['qdp'] = df_current['qdp']
-    df_current_output['Viscosity'] = df_current['Viscosity']
-    df_current_output['Permeability'] = df_current['Permeability']
-    df_current_output['Time (Min)'] = df_current.index*0.5
-    df_current_output['Average Permeability (nD)'] = ""
-    df_current_output = df_current_output.reset_index()
-    csv_title = current_sample['client'] + ' ' + current_sample['sample ID']
-    csv_path = outputfolder + "\\" + csv_title + ".csv"
-    df_params = pd.DataFrame.from_dict(current_sample)
-    df_params['sample ID'] = df_params['client'] + " " + df_params['sample ID']
-    df_params['area'] = math.pi*(df_params['diameter']/2)**2
-    df_params = df_params.iloc[[-1]]
-    df_params = df_params.reset_index()
-    df_params = df_params.drop(['client', 'Start Time', 'End Time', 'Instance Comment'], axis = 1)
-    reorder = ['area', 'sample ID', 'diameter', 'length','vessel', 'perm_min', 'perm_max', 'comment', 'Pump', 'time scale', 'temperature', 'fluid']
-    df_params = df_params[reorder]
-    df_concat = pd.concat([df_current_output, df_params], axis = 1)
-    df_concat = df_concat.drop(['index'], axis = 1)
-    df_concat.to_csv(csv_path)
+# def csv_output(df_current, current_sample):
+#     df_current_output = pd.DataFrame()
+#     df_current_output['DateTime'] = df_current['DateTime']
+#     df_current_output['Upstream Pressure (psi)'] = df_current['Upstream Pressure']
+#     df_current_output['Downstream Pressure (psi)'] = df_current['Downstream Pressure']
+#     df_current_output['dp'] = df_current['dp']
+#     df_current_output['absdp'] = df_current['absdp']
+#     df_current_output['Rate (cc/min)'] = df_current['Rate']
+#     df_current_output['Confining Pressure (psi)'] = df_current['Confining Pressure']
+#     df_current_output['Comments'] = df_current['Comment']
+#     df_current_output['qdp'] = df_current['qdp']
+#     df_current_output['Viscosity'] = df_current['Viscosity']
+#     df_current_output['Permeability'] = df_current['Permeability']
+#     df_current_output['Time (Min)'] = df_current.index*0.5
+#     df_current_output['Average Permeability (nD)'] = ""
+#     df_current_output = df_current_output.reset_index()
+#     csv_title = current_sample['client'] + ' ' + current_sample['sample ID']
+#     csv_path = outputfolder + "\\" + csv_title + ".csv"
+#     df_params = pd.DataFrame.from_dict(current_sample)
+#     df_params['sample ID'] = df_params['client'] + " " + df_params['sample ID']
+#     df_params['area'] = math.pi*(df_params['diameter']/2)**2
+#     df_params = df_params.iloc[[-1]]
+#     df_params = df_params.reset_index()
+#     df_params = df_params.drop(['client', 'Start Time', 'End Time', 'Instance Comment'], axis = 1)
+#     reorder = ['area', 'sample ID', 'diameter', 'length','vessel', 'perm_min', 'perm_max', 'comment', 'Pump', 'time scale', 'temperature', 'fluid']
+#     df_params = df_params[reorder]
+#     df_concat = pd.concat([df_current_output, df_params], axis = 1)
+#     df_concat = df_concat.drop(['index'], axis = 1)
+#     df_concat.to_csv(csv_path)
     
 app = dash.Dash(__name__,external_stylesheets=[dbc.themes.SIMPLEX])
 app.layout = html.Div(
@@ -102,8 +102,8 @@ def timenow(n):
     print('combine complete')
     print('db update ended, safe to pause script')
     end = time.time()
-    print(end - start)
-    return("last updated: " + str(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')))
+    # print(end - start)
+    return("loading time: " + str(end - start) + "last updated: " + str(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')))
 
 if __name__ == '__main__':
     app.run_server(debug=True)

@@ -26,7 +26,7 @@ class logLoader:
     def dxdLoader(self):
         df_dxd = pd.read_csv(self.dxd, skiprows=7, error_bad_lines=False)
         df_dxd.drop(df_dxd.columns[[3, 4, 6, 7, 9, 10, 12, 13, 15, 16,
-                        18, 19, 21, 22, 24, 25, 27, 28, 30, 31, 33, 34, 36, 37, 39, 40, 42,43,44,45,46,47,48,49,50,51,52,53,54,55]], axis=1, inplace=True)
+                18, 19, 21, 22, 24, 25, 27, 28, 30, 31, 33, 34, 36, 37, 39, 40, 42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61]], axis=1, inplace=True)
         # print(df_dxd.head())
         df_dxd.columns = ['Date', 'Time','SS1Conf', 'SS1Up', 'SS1Down', 'SS2Conf', 'SS2Up', 
                                 'SS2Down', 'Ext3Conf', 'Ext3Up', 'Ext3Down', 'Ext4Conf', 'Ext4Up', 'Ext4Down', 'DeadulusUp', 'DeadulusDown']
@@ -66,7 +66,7 @@ class logLoader:
     def vindumLoader(self):
         df_vin = pd.read_csv(self.vindum, index_col=False)
         mainlist = ['Date', 'Time', 'P1 Press', 'P1 Rate', 'P2 Press',
-                    'P2 Rate', 'P3 Press', 'P3 Rate', 'P4 Press', 'P4 Rate']
+            'P2 Rate', 'P3 Press', 'P3 Rate', 'P4 Press', 'P4 Rate', 'P1 Cum Vol', 'P2 Cum Vol', 'P3 Cum Vol', 'P4 Cum Vol']
         df_vin = df_vin[[c for c in df_vin.columns if c in mainlist]]
         
         df_vin = df_vin[:-1]
@@ -75,7 +75,7 @@ class logLoader:
         df_vin['DateTime'] = df_vin['DateTime'].dt.round('30s')
         df_vin = df_vin.drop_duplicates(subset='DateTime', keep="first")
         df_vin = df_vin.drop(['Date', 'Time'], axis=1)
-        df_vin.columns = ['P1Pres', 'P1Rate', 'P2Pres','P2Rate', 'P3Pres', 'P3Rate', 'P4Pres', 'P4Rate', 'DateTime']
+        df_vin.columns = ['P1Pres', 'P1Rate', 'P1Cum', 'P2Pres','P2Rate', 'P2Cum', 'P3Pres', 'P3Rate', 'P3Cum', 'P4Pres', 'P4Rate', 'P4Cum', 'DateTime']
         df_vin = df_vin.dropna(subset = ['DateTime'])
         df_vin = df_vin.sort_values(by='DateTime')
 

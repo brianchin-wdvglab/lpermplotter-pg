@@ -38,10 +38,15 @@ def sample_data(current_sample):
         df_sample.loc[mask, 'Confining Pressure'] = df_sample_raw[current_sample['vessel']+'Conf']
         df_sample.loc[mask, 'Upstream Pressure'] = df_sample_raw[current_sample['vessel']+'Up']
         df_sample.loc[mask, 'Downstream Pressure'] = df_sample_raw[current_sample['vessel']+'Down']
+        # df_sample.loc[mask, 'Cumulative Volume'] = df_sample_raw[current_sample['vessel']+'Cum']
+
         if current_sample['Pump'][i] == 'None':
             df_sample.loc[mask, 'Rate'] = 0
+            df_sample.loc[mask, 'Cumulative Volume'] = 0
         else:
             df_sample.loc[mask, 'Rate'] = df_sample_raw[current_sample['Pump'][i]+'Rate']
+            df_sample.loc[mask, 'Cumulative Volume'] = df_sample_raw[current_sample['Pump'][i]+'Cum']
+        
         #df_sample.loc[mask, 'Rate'] = df_sample_raw[current_sample['Pump'][i]+'Rate']
         df_sample.loc[mask, 'Comment'] = current_sample['Instance Comment'][i]
     #temp values for viscosity params
