@@ -5,9 +5,31 @@ import csv
 import sqlite3
 import time
 import psycopg2
+import re
+import os
+import glob
+import os.path, time
 
-df_dxd = pd.read_csv(r"M:\DXD Log Files\DXD_Log_9_4_1009am.csv", skiprows=7, error_bad_lines=False)
-df_dxd.drop(df_dxd.columns[[3, 4, 6, 7, 9, 10, 12, 13, 15, 16,
-                18, 19, 21, 22, 24, 25, 27, 28, 30, 31, 33, 34, 36, 37, 39, 40, 42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61]], axis=1, inplace=True)
-df_dxd.to_csv("test.csv")
-print(df_dxd.head)
+
+
+folderdir = r"M:\DXD Log Files"
+mylist = glob.glob(folderdir + '/*') # * means all if need specific format then *.csv
+r_nmr = re.compile(".*NMR")
+nmrlist = list(filter(r_nmr.match, mylist)) # Read Note
+latestnmr = max(nmrlist, key=os.path.getctime)
+
+#temp = r"M:\DXD Log Files\VindumPumpLog (Pump1NMR) 6-8 1240pm.csv"
+df_vinnmr = pd.read_csv(latestnmr, index_col=False,  error_bad_lines=False)
+df_vinnmr = df_vinnmr[['Date', 'Time', 'P1 Press', 'P1 Rate', 'P2 Press', 'P2 Rate']]
+df_vinnmr.columns = ['Date', 'Time', 'P1NMRPres', 'P1NMRRate', 'P2NMRPres', 'P2NMRRate']
+# df_vinnmr = df_vinnmr[:-1]
+# df_vinnmr['DateTime'] = pd.to_datetime(df_vinnmr['Date'].astype(str) + ' ' + df_vinnmr['Time'].astype(str))
+# df_vinnmr['DateTime'] = pd.to_datetime(df_vinnmr['DateTime'])
+
+# df_vinnmr['DateTime'] = df_vinnmr['DateTime'].dt.round('30s') 
+# df_vinnmr = df_vinnmr.drop_duplicates(subset='DateTime', keep="first")
+# df_vinnmr = df_vinnmr.drop(['Date', 'Time'], axis=1) 
+# df_vinnmr = df_vinnmr.dropna()
+# df_vinnmr = df_vinnmr.sort_values(by='DateTime')
+
+print(df_vinnmr.head())

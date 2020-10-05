@@ -20,6 +20,8 @@ from sampleparser import sample
 import dash_bootstrap_components as dbc
 import logloader
 import time
+from json import JSONEncoder
+import json
 
 VALID_USERNAME_PASSWORD_PAIRS = {
     'safdar': 'ali',
@@ -32,7 +34,15 @@ VALID_USERNAME_PASSWORD_PAIRS = {
 
 samplesheet = r"M:\Team Chaos Liquid Perm Initialization v5.xlsx"
 outputfolder = r"M:\Lpermplotter output"
+outputfolder_json = r"M:\Lpermplotter json output"
 def csv_output(df_current, current_sample):
+
+    sample_JSONData = json.dumps(current_sample, indent=4, cls=DateTimeEncoder)
+    output_fn = current_sample['client'] + " " + current_sample['sample ID'] + ".json"
+    csv_path_json = outputfolder_json + "\\" + output_fn + ".csv"
+    with open(csv_path_json, "w") as outfile:  
+        json.dump(sample_JSONData, outfile)
+    
     df_current_output = pd.DataFrame()
     df_current_output['DateTime'] = df_current['DateTime']
     df_current_output['Upstream Pressure (psi)'] = df_current['Upstream Pressure']
@@ -63,6 +73,13 @@ def csv_output(df_current, current_sample):
     df_concat = df_concat.drop(['index'], axis = 1)
     df_concat.to_csv(csv_path)
 def csv_output_dead(df_current, current_sample):
+
+    sample_JSONData = json.dumps(current_sample, indent=4, cls=DateTimeEncoder)
+    output_fn = current_sample['client'] + " " + current_sample['sample ID'] + ".json"
+    csv_path_json = outputfolder_json + "\\" + output_fn + ".csv"
+    with open(csv_path_json, "w") as outfile:  
+        json.dump(sample_JSONData, outfile)
+    
     df_current_output = pd.DataFrame()
     df_current_output['DateTime'] = df_current['DateTime']
     df_current_output['Upstream Pressure (psi)'] = df_current['Upstream Pressure']
@@ -93,6 +110,11 @@ def csv_output_dead(df_current, current_sample):
     df_concat = df_concat.drop(['index'], axis = 1)
     df_concat.to_csv(csv_path)   
 
+class DateTimeEncoder(JSONEncoder):
+        #Override the default method
+        def default(self, obj):
+            if isinstance(obj, (datetime.date, datetime.datetime)):
+                return obj.isoformat()
 
 app = dash.Dash(__name__,external_stylesheets=[dbc.themes.SIMPLEX])
 auth = dash_auth.BasicAuth(

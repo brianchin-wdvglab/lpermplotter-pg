@@ -62,6 +62,8 @@ def sample_data(current_sample):
     df_sample['Viscosity'] = (a*df_sample['Upstream Pressure'].astype(int)+b)*current_sample['visc_mult']
     area = math.pi*(current_sample['diameter']/2)**2
     df_sample['Permeability'] = (df_sample['Rate']/60*df_sample['Viscosity']*current_sample['length']*1000) / (area*(df_sample['dp']/14.696))*1000000
+    df_sample.sort_values(by=['DateTime'], inplace=True, ascending=True)
+
     return df_sample
 
 def sample_data_dead(current_sample):
@@ -112,6 +114,7 @@ def sample_data_dead(current_sample):
     df_sample['Viscosity'] = (a*df_sample['Upstream Pressure'].astype(int)+b)*current_sample['visc_mult']
     area = math.pi*(current_sample['diameter']/2)**2
     df_sample['Permeability'] = (df_sample['Rate']/60*df_sample['Viscosity']*current_sample['length']*1000) / (area*(df_sample['dp']/14.696))*1000000
+    df_sample.sort_values(by=['DateTime'], inplace=True, ascending=True)
     return df_sample
 
 def sample_data_eor(current_sample):
@@ -165,6 +168,7 @@ def sample_data_eor(current_sample):
     #time_window = current_sample['length']
     time_window = 60
     df_sample['Permeability'] = df_sample['Permeability'].rolling(window=time_window).mean()
+    df_sample.sort_values(by=['DateTime'], inplace=True, ascending=True)
     return df_sample
 
 # #get sample info
