@@ -26,10 +26,12 @@ class logLoader:
     def dxdLoader(self):
         df_dxd = pd.read_csv(self.dxd, skiprows=7, error_bad_lines=False)
         df_dxd.drop(df_dxd.columns[[3, 4, 6, 7, 9, 10, 12, 13, 15, 16,
-                18, 19, 21, 22, 24, 25, 27, 28, 30, 31, 33, 34, 36, 37, 39, 40, 42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61]], axis=1, inplace=True)
-        # print(df_dxd.head())
-        df_dxd.columns = ['Date', 'Time','SS1Conf', 'SS1Up', 'SS1Down', 'SS2Conf', 'SS2Up', 
-                                'SS2Down', 'Ext3Conf', 'Ext3Up', 'Ext3Down', 'Ext4Conf', 'Ext4Up', 'Ext4Down', 'DeadulusUp', 'DeadulusDown']
+                18, 19, 21, 22, 24, 25, 27, 28, 30, 31, 33, 34, 36, 37, 
+                39, 40, 42,43,45,46,48,49,51,52,54,55,57,58,60,61]], axis=1, inplace=True)
+        df_dxd.columns = ['Date', 'Time','SS1Conf', 'SS1Up', 'SS1Down', 
+                'SS2Conf', 'SS2Up', 'SS2Down', 'Ext3Conf', 'Ext3Up', 'Ext3Down', 
+                'Ext4Conf', 'Ext4Up', 'Ext4Down', 'DeadulusUp', 'DeadulusDown', 
+                'EOR5Conf', 'EOR6Conf','EOR6Up', 'EOR6Down','EOR5Up', 'EOR5Down']
         df_dxd['DateTime'] = pd.to_datetime(df_dxd['Date'] + " " + df_dxd['Time'])
         df_dxd['DateTime'] = df_dxd['DateTime'].dt.round('30s')  
         df_dxd = df_dxd.dropna()
@@ -88,8 +90,8 @@ class logLoader:
         #temp = r"M:\DXD Log Files\VindumPumpLog (Pump1NMR) 6-8 1240pm.csv"
         df_vinnmr = pd.read_csv(self.vindumNMR, index_col=False,  error_bad_lines=False)
         #df_vinnmr = pd.read_csv(temp, index_col=False,  error_bad_lines=False)
-        df_vinnmr = df_vinnmr[['Date', 'Time', 'P1 Press', 'P1 Rate', 'P2 Press', 'P2 Rate']]
-        df_vinnmr.columns = ['Date', 'Time', 'P1NMRPres', 'P1NMRRate', 'P2NMRPres', 'P2NMRRate']
+        df_vinnmr = df_vinnmr[['Date', 'Time', 'P1 Press', 'P1 Rate', 'P2 Press', 'P2 Rate', 'P1 Cum Vol', 'P2 Cum Vol']]
+        df_vinnmr.columns = ['Date', 'Time', 'P1NMRPres', 'P1NMRRate', 'P2NMRPres', 'P2NMRRate', 'P1NMRCum', 'P2NMRCum']
         df_vinnmr = df_vinnmr[:-1]
         df_vinnmr['DateTime'] = pd.to_datetime(df_vinnmr['Date'].astype(str) + ' ' + df_vinnmr['Time'].astype(str))
         df_vinnmr['DateTime'] = pd.to_datetime(df_vinnmr['DateTime'])

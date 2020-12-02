@@ -131,6 +131,8 @@ app.layout = html.Div(
         dcc.Graph(id='live-update-graph2'),
         dcc.Graph(id='live-update-graph3'),
         dcc.Graph(id='live-update-graph4'),
+        dcc.Graph(id='live-update-graph5'),
+        dcc.Graph(id='live-update-graph6'),
 
         #dcc.Graph(id='live-update-graph5'),
         dcc.Interval(
@@ -369,13 +371,105 @@ def plot4(n):
                     yaxis=dict(title="Permeability - nD", titlefont=dict(color="Blue"), anchor="free",
                                 tickfont=dict(color="Blue"), range=[current_sample['perm_min'], current_sample['perm_max']]),
                     yaxis2=dict(title="Pressure - psia", titlefont=dict(color="Red"), tickfont=dict(
-                        color="Red"), anchor="free", overlaying="y", side="right", position=0.85, range=[0, 5000]),
+                        color="Red"), anchor="free", overlaying="y", side="right", position=0.85, range=[0, 10000]),
                     yaxis3=dict(title="Flow rate - cc/min", titlefont=dict(color="Green"), tickfont=dict(
                         color="Green"), anchor="free", overlaying="y", side="right", position=0.89, range=[0, .0005]),
                     yaxis4=dict(title="q over dp", titlefont=dict(color="Black"), tickfont=dict(
                         color="Black"), anchor="free", overlaying="y", side="right", position=0.93, range=[0, .000001]),
                     yaxis5=dict(title="confining pressure", titlefont=dict(color="Orange"), tickfont=dict(
                         color="Orange"), anchor="free", overlaying="y", side="right", position=0.97, range=[0, 10000]))
+    return fig
+
+@app.callback(Output('live-update-graph5', 'figure'),
+              [Input('interval-component', 'n_intervals')])
+# m is the sheet name
+def plot5(n):
+    current_sample = sample(samplesheet, 'EOR5').sampleprop()
+    df_current = sample_data(current_sample)
+    csv_output(df_current, current_sample)
+    xax=df_current.DateTime
+    fig = go.Figure()
+    fig = make_subplots(specs=[[{"secondary_y": True}]])
+    #fig = go.Figure([go.Scatter(x=df_current['DateTime'], y=df_current['Rate'])])
+    fig.update_xaxes(rangeslider_visible=True)
+    #print(df_current.head())
+    fig.add_trace(go.Scatter(x=xax, y=df_current.Permeability,
+                            name="Permeability", line_color='Blue', opacity=.5, hovertext=df_current.Comment))
+    fig.add_trace(go.Scatter(x=xax, y=df_current['Upstream Pressure'],
+                            name="Upstream", line_color='red', yaxis="y2"))
+    fig.add_trace(go.Scatter(x=xax, y=df_current['Downstream Pressure'],
+                            name="Downstream", line_color='purple', yaxis="y2"))
+    #fig.add_trace(go.Scatter(x=xax, y=df_current['rollingq'],
+    fig.add_trace(go.Scatter(x=xax, y=df_current.Rate,
+                            name="Flow Rate", line_color='Green', yaxis="y3", opacity=.5))
+    fig.add_trace(go.Scatter(x=xax, y=df_current.qdp,
+                            name="q over dp", line_color='Black', yaxis="y4", opacity=.5))
+    fig.add_trace(go.Scatter(x=xax, y=df_current['Confining Pressure'],
+                            name="confining pressure", line_color='Orange', yaxis="y5", opacity=1))
+    fig.add_trace(go.Scatter(x=xax, y=df_current['Cumulative Volume'],
+                            name="Cumulative Volume", line_color='Magenta', yaxis="y6", opacity=1))
+    title = '| Sample ID: ' + current_sample['client'] + ' ' +  current_sample['sample ID'] + ' | Vessel: ' + \
+        current_sample['vessel'] + ' | Pump: ' + current_sample['Pump'][-1] + ' | Temperature: '+ \
+            str(current_sample['temperature']) + ' <br> | Comments: '+current_sample['comment'] + ' | Visc: '+str(current_sample['fluid'])
+    fig.update_layout(plot_bgcolor = "#f3f7fd", paper_bgcolor = "#f3f7fd", title_text=title, title_font_color = "#5c0325", xaxis_rangeslider_visible=True, xaxis=dict(domain=[0, 0.8]), hovermode='x',
+                    yaxis=dict(title="Permeability - nD", titlefont=dict(color="Blue"), anchor="free",
+                                tickfont=dict(color="Blue"), range=[current_sample['perm_min'], current_sample['perm_max']]),
+                    yaxis2=dict(title="Pressure - psia", titlefont=dict(color="Red"), tickfont=dict(
+                        color="Red"), anchor="free", overlaying="y", side="right", position=0.8, range=[0, 10000]),
+                    yaxis3=dict(title="Flow rate - cc/min", titlefont=dict(color="Green"), tickfont=dict(
+                        color="Green"), anchor="free", overlaying="y", side="right", position=0.84, range=[0, .0005]),
+                    yaxis4=dict(title="q over dp", titlefont=dict(color="Black"), tickfont=dict(
+                        color="Black"), anchor="free", overlaying="y", side="right", position=0.88, range=[0, .000001]),
+                    yaxis5=dict(title="confining pressure", titlefont=dict(color="Orange"), tickfont=dict(
+                        color="Orange"), anchor="free", overlaying="y", side="right", position=0.92, range=[0, 10000]),
+                    yaxis6=dict(title="Cumulative Volume", titlefont=dict(color="Orange"), tickfont=dict(
+                        color="Orange"), anchor="free", overlaying="y", side="right", position=0.96, range=[0, 5]))
+    return fig
+
+@app.callback(Output('live-update-graph6', 'figure'),
+              [Input('interval-component', 'n_intervals')])
+# m is the sheet name
+def plot6(n):
+    current_sample = sample(samplesheet, 'EOR6').sampleprop()
+    df_current = sample_data(current_sample)
+    csv_output(df_current, current_sample)
+    xax=df_current.DateTime
+    fig = go.Figure()
+    fig = make_subplots(specs=[[{"secondary_y": True}]])
+    #fig = go.Figure([go.Scatter(x=df_current['DateTime'], y=df_current['Rate'])])
+    fig.update_xaxes(rangeslider_visible=True)
+    #print(df_current.head())
+    fig.add_trace(go.Scatter(x=xax, y=df_current.Permeability,
+                            name="Permeability", line_color='Blue', opacity=.5, hovertext=df_current.Comment))
+    fig.add_trace(go.Scatter(x=xax, y=df_current['Upstream Pressure'],
+                            name="Upstream", line_color='red', yaxis="y2"))
+    fig.add_trace(go.Scatter(x=xax, y=df_current['Downstream Pressure'],
+                            name="Downstream", line_color='purple', yaxis="y2"))
+    #fig.add_trace(go.Scatter(x=xax, y=df_current['rollingq'],
+    fig.add_trace(go.Scatter(x=xax, y=df_current.Rate,
+                            name="Flow Rate", line_color='Green', yaxis="y3", opacity=.5))
+    fig.add_trace(go.Scatter(x=xax, y=df_current.qdp,
+                            name="q over dp", line_color='Black', yaxis="y4", opacity=.5))
+    fig.add_trace(go.Scatter(x=xax, y=df_current['Confining Pressure'],
+                            name="confining pressure", line_color='Orange', yaxis="y5", opacity=1))
+    fig.add_trace(go.Scatter(x=xax, y=df_current['Cumulative Volume'],
+                            name="Cumulative Volume", line_color='Magenta', yaxis="y6", opacity=1))
+    title = '| Sample ID: ' + current_sample['client'] + ' ' +  current_sample['sample ID'] + ' | Vessel: ' + \
+        current_sample['vessel'] + ' | Pump: ' + current_sample['Pump'][-1] + ' | Temperature: '+ \
+            str(current_sample['temperature']) + ' <br> | Comments: '+current_sample['comment'] + ' | Visc: '+str(current_sample['fluid'])
+    fig.update_layout(plot_bgcolor = "#f3f7fd", paper_bgcolor = "#f3f7fd", title_text=title, title_font_color = "#5c0325", xaxis_rangeslider_visible=True, xaxis=dict(domain=[0, 0.8]), hovermode='x',
+                    yaxis=dict(title="Permeability - nD", titlefont=dict(color="Blue"), anchor="free",
+                                tickfont=dict(color="Blue"), range=[current_sample['perm_min'], current_sample['perm_max']]),
+                    yaxis2=dict(title="Pressure - psia", titlefont=dict(color="Red"), tickfont=dict(
+                        color="Red"), anchor="free", overlaying="y", side="right", position=0.8, range=[0, 10000]),
+                    yaxis3=dict(title="Flow rate - cc/min", titlefont=dict(color="Green"), tickfont=dict(
+                        color="Green"), anchor="free", overlaying="y", side="right", position=0.84, range=[0, .0005]),
+                    yaxis4=dict(title="q over dp", titlefont=dict(color="Black"), tickfont=dict(
+                        color="Black"), anchor="free", overlaying="y", side="right", position=0.88, range=[0, .000001]),
+                    yaxis5=dict(title="confining pressure", titlefont=dict(color="Orange"), tickfont=dict(
+                        color="Orange"), anchor="free", overlaying="y", side="right", position=0.92, range=[0, 10000]),
+                    yaxis6=dict(title="Cumulative Volume", titlefont=dict(color="Orange"), tickfont=dict(
+                        color="Orange"), anchor="free", overlaying="y", side="right", position=0.96, range=[0, 5]))
     return fig
 if __name__ == '__main__':
     app.run_server(debug=True,port=8081,host='10.0.100.140')
