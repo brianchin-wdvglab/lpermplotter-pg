@@ -6,7 +6,10 @@ import sqlite3
 import time
 import psycopg2
 from sqlalchemy import create_engine
-
+import re
+import os
+import glob
+import os.path, time
 
 class logLoader:
     def __init__(self, dxd, isco, vindum, vindumNMR, EOR):
@@ -23,6 +26,98 @@ class logLoader:
     def test(self):
         return("hello world")
 
+    def dec_loader_combiner(self): #ugly ass monster
+        folderdir = r"M:\DXD Log Files"
+        mylist = glob.glob(folderdir + '/*') # * means all if need specific format then *.csv
+        r_vin = re.compile("(.*Vindum)(?!.*NMR)")
+        r_vin_eor = re.compile("(.*Vindum)(?!.*NMR)(.*EOR)")
+        r_vin_nmr = re.compile("(.*Vindum)(.*NMR)")
+        r_dxd = re.compile(".*DXD_")
+        r_dxd_eor = re.compile("(.*DXD_)(.*EOR)")
+        r_isco = re.compile("(.*ISCO_)")
+
+        vinlist = list(filter(r_vin.match, mylist)) # Read Note
+        vindum = max(vinlist, key=os.path.getctime)
+        vineorlist = list(filter(r_vin_eor.match, mylist)) # Read Note
+        vindum_eor = max(vineorlist, key=os.path.getctime)
+        vinnmrlist = list(filter(r_vin_nmr.match, mylist)) # Read Note
+        vindum_nmr = max(vinnmrlist, key=os.path.getctime)
+
+        dxdlist = list(filter(r_dxd.match, mylist)) # Read Note
+        dxd = max(dxdlist, key=os.path.getctime)
+        dxdeorlist = list(filter(r_dxd_eor.match, mylist)) # Read Note
+        dxd_eor = max(dxdeorlist, key=os.path.getctime)
+
+        iscolist = list(filter(r_isco.match, mylist)) # Read Note
+        latestisco = max(iscolist, key=os.path.getctime)
+
+        #vinnmr portion
+        df_vin_nmr = pd.read_csv(vindum_nmr, index_col=False)
+        mainlist = ['Date', 'Time', 'P1 Press', 'P1 Rate', 'P2 Press', 'P2 Rate', 'P1 Cum Vol', 'P2 Cum Vol']
+        df_vin_nmr = df_vin_nmr[[c for c in df_vin_nmr.columns if c in mainlist]]
+        df_vin_nmr = df_vin_nmr[:-1]
+        df_vin_nmr.columns = ['Date', 'Time', 'P1NMRPres', 'P1NMRRate', 'P1NMRCum', 'P2NMRPres', 'P2NMRRate', 'P2NMRCum']
+        df_vin_nmr['DateTime'] = pd.to_datetime(df_vin_nmr['Date'] + " " + df_vin_nmr['Time'])
+        df_vin_nmr['DateTime'] = df_vin_nmr['DateTime'].dt.round('30s')  
+        df_vin_nmr = df_vin_nmr.dropna()
+        df_vin_nmr = df_vin_nmr.drop_duplicates(subset='DateTime', keep="first")
+        df_vin_nmr = df_vin_nmr.drop(['Date', 'Time'], axis=1)
+
+        #vineor portion
+        df_vin_eor = pd.read_csv(vindum_eor, index_col=False)
+        mainlist = ['Date', 'Time', 'P1 Press', 'P1 Rate', 'P2 Press', 'P2 Rate', 'P1 Cum Vol', 'P2 Cum Vol']
+        df_vin_eor = df_vin_eor[[c for c in df_vin_eor.columns if c in mainlist]]
+        df_vin_eor = df_vin_eor[:-1]
+        df_vin_eor.columns = ['Date', 'Time', 'P1EORPres', 'P1EORRate', 'P1EORCum', 'P2EORPres', 'P2EORRate', 'P2EORCum']
+        df_vin_eor['DateTime'] = pd.to_datetime(df_vin_eor['Date'] + " " + df_vin_eor['Time'])
+        df_vin_eor['DateTime'] = df_vin_eor['DateTime'].dt.round('30s')  
+        df_vin_eor = df_vin_eor.dropna()
+        df_vin_eor = df_vin_eor.drop_duplicates(subset='DateTime', keep="first")
+        df_vin_eor = df_vin_eor.drop(['Date', 'Time'], axis=1)        
+
+        #vin portion
+        df_vin = pd.read_csv(vindum, index_col=False)
+        mainlist = ['Date', 'Time', 'P1 Press', 'P1 Rate', 'P2 Press', 'P2 Rate', 'P3 Press', 'P3 Rate', 'P4 Press', 'P4 Rate', 'P1 Cum Vol', 'P2 Cum Vol', 'P3 Cum Vol', 'P4 Cum Vol']
+        df_vin = df_vin[[c for c in df_vin.columns if c in mainlist]]
+        df_vin = df_vin[:-1]
+        df_vin['DateTime'] = pd.to_datetime(df_vin['Date'] + " " + df_vin['Time'])
+        df_vin['DateTime'] = df_vin['DateTime'].dt.round('30s')  
+        df_vin = df_vin.dropna()
+        df_vin = df_vin.drop_duplicates(subset='DateTime', keep="first")
+        df_vin = df_vin.drop(['Date', 'Time'], axis=1)
+
+        df_dxd_eor = pd.read_csv(dxd_eor, skiprows=7, error_bad_lines=False)
+        df_dxd_eor.drop(df_dxd_eor.columns[[3, 4, 6, 7, 9, 10, 12, 13, 15, 16, 
+            18, 19, 21, 22, 24, 25]], axis=1, inplace=True)
+        df_dxd_eor.columns = ['Date', 'Time','EOR5Conf', 'EOR5Up', 'EOR5Down', 'EOR6Conf', 'EOR6Up', 'EOR6Down', 'DeadulusUp', 'DeadulusDown']
+        df_dxd_eor['DateTime'] = pd.to_datetime(df_dxd_eor['Date'] + " " + df_dxd_eor['Time'])
+        df_dxd_eor['DateTime'] = df_dxd_eor['DateTime'].dt.round('30s')  
+        df_dxd_eor = df_dxd_eor.dropna()
+        df_dxd_eor = df_dxd_eor.drop_duplicates(subset='DateTime', keep="first")
+        df_dxd_eor = df_dxd_eor.drop(['Date', 'Time'], axis=1)
+
+        df_dxd = pd.read_csv(dxd, skiprows=7, error_bad_lines=False)
+        df_dxd.drop(df_dxd.columns[[3, 4, 6, 7, 9, 10, 12, 13, 15, 16, 
+            18, 19, 21, 22, 24, 25, 27, 28, 30, 31, 33, 34, 36, 37]], axis=1, inplace=True)
+        df_dxd.columns = ['Date', 'Time','SS1Conf', 'SS1Up', 'SS1Down', 'SS2Conf', 'SS2Up', 'SS2Down', 'Ext3Conf', 'Ext3Up', 'Ext3Down', 'Ext4Conf', 'Ext4Up', 'Ext4Down']
+        df_dxd['DateTime'] = pd.to_datetime(df_dxd['Date'] + " " + df_dxd['Time'])
+        df_dxd['DateTime'] = df_dxd['DateTime'].dt.round('30s')  
+        df_dxd = df_dxd.dropna()
+        df_dxd = df_dxd.drop_duplicates(subset='DateTime', keep="first")
+        df_dxd = df_dxd.drop(['Date', 'Time'], axis=1)
+
+        df_com = pd.merge_asof(df_dxd, df_dxd_eor.sort_values('DateTime'), on='DateTime')
+        df_com = pd.merge_asof(df_com, df_vin.sort_values('DateTime'), on='DateTime')
+        df_com = pd.merge_asof(df_com, df_vin_eor.sort_values('DateTime'), on='DateTime')
+        df_com = pd.merge_asof(df_com, df_vin_nmr.sort_values('DateTime'), on='DateTime')
+        df_com['DateTime'] = pd.to_datetime(df_com['DateTime'] ,errors='coerce')
+        df_com.fillna(0, inplace=True)
+
+        df_temp = pd.read_sql_query("SELECT * from combined_temp_dec", self.conn)
+        cond = df_com['DateTime'].isin(df_temp['DateTime'])
+        df_com.drop(df_com[cond].index, inplace = True)
+        df_com = df_com.drop_duplicates(subset='DateTime', keep="first")
+        df_com.to_sql('combined_temp_dec', self.conn, if_exists='append', index = False)
     def dxdLoader(self):
         df_dxd = pd.read_csv(self.dxd, skiprows=7, error_bad_lines=False)
         df_dxd.drop(df_dxd.columns[[3, 4, 6, 7, 9, 10, 12, 13, 15, 16,
